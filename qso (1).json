@@ -1,0 +1,57 @@
+[
+  {
+    "call": "YH9AA",
+    "date": "2026-05-26",
+    "time": "17:28:13",
+    "band": "2M",
+    "freq": "145.750",
+    "mode": "FM",
+    "rsttx": "59",
+    "rstrx": "59",
+    "operator": "YC9BQM"
+  },
+  {
+    "call": "YD9AYP",
+    "date": "2026-05-26",
+    "time": "17:35:23",
+    "band": "40M",
+    "freq": "7.125",
+    "mode": "SSB",
+    "rsttx": "59",
+    "rstrx": "59",
+    "operator": "YF9BSZ"
+  },
+  {
+    "call": "YH9AA",
+    "date": "2026-05-26",
+    "time": "17:45:23",
+    "band": "40M",
+    "freq": "7.125",
+    "mode": "SSB",
+    "rsttx": "59",
+    "rstrx": "59",
+    "operator": "YF9BSZ"
+  },
+  {
+    "call": "YG3ETQ",
+    "date": "2026-05-26",
+    "time": "18:07:46",
+    "band": "40M",
+    "freq": "7.125",
+    "mode": "SSB",
+    "rsttx": "59",
+    "rstrx": "59",
+    "operator": "YF9BSZ"
+  },
+  {
+    "call": "YC9ABC",
+    "date": "2026-05-26",
+    "time": "18:13:42",
+    "band": "40M",
+    "freq": "7.125",
+    "mode": "SSB",
+    "rsttx": "59",
+    "rstrx": "59",
+    "operator": "YF9BSZ"
+  }
+]
