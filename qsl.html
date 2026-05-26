@@ -137,10 +137,11 @@ fetch("qso.json")
 
 .then(data => {
 
-let found=data.find(
+let filtered=data.filter(
 q => q.call === input
 );
 
+let found=filtered[filtered.length-1];
 if(found){
 
 document.getElementById("message")
