@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>9bqm Logger</title>
+
+<style>
+
+body{
+background:#111;
+color:#00ff66;
+font-family:Consolas;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#ffd700;
+}
+
+.form{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-bottom:15px;
+}
+
+input,select{
+padding:10px;
+font-size:18px;
+background:#000;
+color:#00ff66;
+border:2px solid #00ff66;
+}
+
+button{
+padding:10px;
+font-size:16px;
+background:#222;
+color:#ffd700;
+border:2px solid #ffd700;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid #00ff66;
+padding:8px;
+text-align:center;
+}
+
+th{
+background:#222;
+color:#ffd700;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>9BQM LOGGER</h1>
+
+<div class="form">
+
+<input id="callsign" placeholder="CALLSIGN" autofocus>
+
+<select id="band">
+<option>2M</option>
+<option>70CM</option>
+<option>40M</option>
+</select>
+
+<input id="freq" value="145.500">
+
+<select id="mode">
+<option>SSB</option>
+<option>FM</option>
+<option>CW</option>
+</select>
+
+<input id="rsttx" value="59">
+
+<input id="rstrx" value="59">
+
+<input id="operator" placeholder="OPERATOR">
+
+</div>
+
+<button onclick="addLog()">ENTER = SAVE QSO</button>
+
+<button onclick="editQSO()">EDIT</button>
+
+<button onclick="clearLog()">CLEAR LOG</button>
+
+<button onclick="exportADIF()">EXPORT ADIF</button>
+
+<button onclick="exportJSON()">EXPORT JSON</button>
+
+<table id="logTable">
+
+<thead>
+<tr>
+<th>No</th>
+<th>Callsign</th>
+<th>Date</th>
+<th>Time</th>
+<th>Band</th>
+<th>Freq</th>
+<th>Mode</th>
+<th>RST TX</th>
+<th>RST RX</th>
+<th>Operator</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+</table>
+
+<script>
+
+let total=0;
+let qsoData=[];
+let editIndex=-1;
+
+window.onload=function(){
+
+let saved=localStorage.getItem("qsoData");
+
+if(saved){
+
+qsoData=JSON.parse(saved);
+
+qsoData.forEach(addRow);
+
+}
+
+}
+
+function saveDatabase(){
+
+localStorage.setItem(
+"qsoData",
+JSON.stringify(qsoData)
+);
+
+}
+
+function addLog(){
+
+let call=document.getElementById("callsign")
+.value.toUpperCase().trim();
+
+if(call=="") return;
+
+let now=new Date();
+
+let qso={
+
+call:call,
+date:now.toISOString().slice(0,10),
+time:now.toISOString().slice(11,19),
+band:document.getElementById("band").value,
+freq:document.getElementById("freq").value,
+mode:document.getElementById("mode").value,
+rsttx:document.getElementById("rsttx").value,
+rstrx:document.getElementById("rstrx").value,
+operator:document.getElementById("operator").value
+
+};
+
+qsoData.push(qso);
+
+saveDatabase();
+
+addRow(qso);
+
+document.getElementById("callsign").value="";
+
+document.getElementById("callsign").focus();
+
+}
+
+function addRow(q){
+
+let table=document.querySelector("#logTable tbody");
+
+let row=table.insertRow();
+
+row.innerHTML=`
+
+<td>${++total}</td>
+<td>${q.call}</td>
+<td>${q.date}</td>
+<td>${q.time}</td>
+<td>${q.band}</td>
+<td>${q.freq}</td>
+<td>${q.mode}</td>
+<td>${q.rsttx}</td>
+<td>${q.rstrx}</td>
+<td>${q.operator}</td>
+
+`;
+
+}
+
+document.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+e.preventDefault();
+
+addLog();
+
+}
+
+});
+
+document.querySelector("#logTable tbody")
+.addEventListener("click",function(e){
+
+let row=e.target.parentNode;
+
+let index=row.rowIndex-1;
+
+let q=qsoData[index];
+
+editIndex=index;
+
+document.getElementById("callsign").value=q.call;
+
+document.getElementById("band").value=q.band;
+
+document.getElementById("freq").value=q.freq;
+
+document.getElementById("mode").value=q.mode;
+
+document.getElementById("rsttx").value=q.rsttx;
+
+document.getElementById("rstrx").value=q.rstrx;
+
+document.getElementById("operator").value=q.operator;
+
+});
+
+function editQSO(){
+
+if(editIndex==-1){
+
+alert("Pilih QSO dulu");
+
+return;
+
+}
+
+qsoData[editIndex]={
+
+call:document.getElementById("callsign")
+.value.toUpperCase(),
+
+date:qsoData[editIndex].date,
+
+time:qsoData[editIndex].time,
+
+band:document.getElementById("band").value,
+
+freq:document.getElementById("freq").value,
+
+mode:document.getElementById("mode").value,
+
+rsttx:document.getElementById("rsttx").value,
+
+rstrx:document.getElementById("rstrx").value,
+
+operator:document.getElementById("operator").value
+
+};
+
+saveDatabase();
+
+refreshTable();
+
+editIndex=-1;
+
+}
+
+function refreshTable(){
+
+document.querySelector("#logTable tbody")
+.innerHTML="";
+
+total=0;
+
+qsoData.forEach(addRow);
+
+}
+
+function clearLog(){
+
+if(confirm("Hapus semua log?")){
+
+qsoData=[];
+
+saveDatabase();
+
+refreshTable();
+
+}
+
+}
+
+function exportADIF(){
+
+let adif="";
+
+qsoData.forEach(q=>{
+
+adif+=`
+
+<call:${q.call.length}>${q.call}
+<qso_date:8>${q.date.replace(/-/g,'')}
+<time_on:6>${q.time.replace(/:/g,'')}
+<band:${q.band.length}>${q.band}
+<freq:${q.freq.length}>${q.freq}
+<mode:${q.mode.length}>${q.mode}
+<rst_sent:${q.rsttx.length}>${q.rsttx}
+<rst_rcvd:${q.rstrx.length}>${q.rstrx}
+<operator:${q.operator.length}>${q.operator}
+<eor>
+
+`;
+
+});
+
+let blob=new Blob([adif]);
+
+let a=document.createElement("a");
+
+a.href=URL.createObjectURL(blob);
+
+a.download="MINI_N1MM_LOG.adi";
+
+a.click();
+
+}
+
+function exportJSON(){
+
+let data=JSON.stringify(qsoData,null,2);
+
+let blob=new Blob(
+[data],
+{type:"application/json"}
+);
+
+let a=document.createElement("a");
+
+a.href=URL.createObjectURL(blob);
+
+a.download="qso.json";
+
+a.click();
+
+}
+
+</script>
+
+</body>
+</html>
